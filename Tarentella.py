@@ -7,8 +7,12 @@ James Bay, 11/23/2015 - Requires Python 3.4.3
 """
 
 import os
+import sys
 import logging
 import urllib.request
+import ssl
+from selenium import webdriver
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 
 # Constant definitions
 LOGGING_LEVEL = logging.INFO
@@ -40,13 +44,19 @@ def main():
         return
 
     # Read URL
-    
-    url = "https://www.google.com/search?q=test"
+    if len(sys.argv) <= 1: return
+    url = sys.argv[1]
+
     headers = {}
-    headers['User-Agent'] = "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.27 Safari/537.17"
+    headers["User-Agent"] = "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.27 Safari/537.17"
     req = urllib.request.Request(url, headers = headers)
-    response = urllib.request.urlopen(req)
+
+    context = ssl._create_unverified_context()  # Restores previous certificate validation behavior
+    response = urllib.request.urlopen(req, context = context)
     the_page = response.read()
+
+    print( response.geturl())
+    print( response.info())
     print( the_page )
 
     LOGGER.info("Tarentella.py exiting.")
